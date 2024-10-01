@@ -29,12 +29,19 @@
         <form class="pure-form" action="./search/" method="get">
           <fieldset>
             <input type="search" id="searchbox" autocomplete="on" autocorrect="on" autocapitalize="none" spellcheck="false" autofocus="" name="q" placeholder="検索" title="検索" value="">
+            <span id="word-display"></span>
           </fieldset>
         </form>
       </div>
       <div class="pure-u-1-4"></div>
     </div>
     <script>
+      function updateSpan() {
+          const searchValue = document.getElementById('searchbox').value;
+          document.getElementById('word-display').textContent = searchValue;
+        }
+
+      
     $('#searchbox').autocomplete({
         source: function (request, response) {
             var url = "/suggest?keyword=" + encodeURIComponent(request.term);
