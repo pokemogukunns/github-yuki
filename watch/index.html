@@ -25,7 +25,7 @@
         <div class="pure-u-1 pure-u-md-12-24 searchbar">
           <a href="./requestform">新機能の要望やバグ報告</a><br> 
           <a href="./bbs">掲示板</a>
-          <form class="pure-form" action="./search/index.html" method="get"> 
+          <form class="pure-form" action="/github-yuki/search/" method="get"> 
             <fieldset> 
               <input type="search" id="searchbox" autocomplete="on" autocorrect="on" autocapitalize="none" spellcheck="false" name="q" placeholder="検索" title="検索" value=""> 
             </fieldset> 
@@ -43,17 +43,17 @@
           <a href="javascript:{navigator.share({title: '動画を共有',text: '{{videotitle}}',url: location.protocol+'//'+document.domain+'/watch?v={{ videoid }}'+'&t='+Math.floor(document.getElementById('player').currentTime),})}">現時点の動画を共有</a><br>
           <a href="javascript:{navigator.share({title: '動画を共有',text: '{{videotitle}}',url: location.href,})}">動画を共有</a><br> 
           <hr> </div> <div class="pure-u-1 pure-u-lg-3-5"> <div class="h-box">
-            <a href="./channel/{{authorid}}" style="display:block;width:fit-content;width:-moz-fit-content"> <div class="channel-profile"> <img src="{{authoricon}}"> <span id="channel-name">{{ author }}</span> </div> </a> 
+            <a href="/github-yuki/channel/{{authorid}}" style="display:block;width:fit-content;width:-moz-fit-content"> <div class="channel-profile"> <img src="{{authoricon}}"> <span id="channel-name">{{ author }}</span> </div> </a> 
             <div id="description-box"> <div id="descriptionWrapper">{{ description | safe}}</div> </div>
             <hr> <div id="comments"> </div> </div> </div> 
         <div class="pure-u-1 pure-u-lg-1-5">
           <!--自動再生<input type="checkbox" id="autonext" onchange="checkautoplay()"><br>-->
-          ループ再生<input type="checkbox" id="loop" onchange="changeloop()"> {% for re in res %} <a href="./watch?v={{ re['id'] }}">
+          ループ再生<input type="checkbox" id="loop" onchange="changeloop()"> {% for re in res %} <a href="/github-yuki/watch?v={{ re['id'] }}">
             <div class="thumbnail">
               <img loading="lazy" class="thumbnail" src="{% if proxy == "True" %}/thumbnail?v={{ re['id']}}{% else %}https://img.youtube.com/vi/{{ re['id'] }}/0.jpg{% endif %}">
             </div>
             <p style="width:100%">{{re["title"]}}</p> </a><br> 
-          <a href="./channel/{{re['authorId']}}">{{re["author"]}}</a>{% endfor %} </div> </div> </div> </div> 
+          <a href="/github-yuki/channel/{{re['authorId']}}">{{re["author"]}}</a>{% endfor %} </div> </div> </div> </div> 
     </div>
     <div class="pure-u-1 pure-u-md-2-24"></div> 
   </div>
