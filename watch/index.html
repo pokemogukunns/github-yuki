@@ -65,7 +65,46 @@
     </div>
     <div class="pure-u-1 pure-u-md-2-24"></div> 
   </div>
+　<script>
+        const apiKey = 'AIzaSyBU2xE_JHvB6wag3tMfhxXpg2Q_W8xnM-I'; // YouTube Data APIキーを入力
 
+        // カスタムURLから動画IDを抽出する関数
+        function extractVideoId(url) {
+            const urlObj = new URL(url); // 入力されたURLを解析
+            const videoId = urlObj.searchParams.get('v'); // "?v=動画ID" の部分を取得
+
+            return videoId;
+        }
+
+        // YouTube APIを使って動画タイトルを取得する関数
+        function getVideoTitleFromUrl() {
+            const videoUrl = document.getElementById('videoUrl').value;
+            const videoId = extractVideoId(videoUrl); // URLから動画IDを抽出
+
+            if (!videoId) {
+                alert("正しい動画のURLを入力してください！");
+                return;
+            }
+
+            const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.items.length > 0) {
+                        const title = data.items[0].snippet.title;
+                        document.getElementById('videotitle').innerText = title; // 動画タイトルを表示
+                    } else {
+                        document.getElementById('videotitle').innerText = "動画が見つかりませんでした";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching video title:', error);
+                    document.getElementById('videotitle').innerText = "エラーが発生しました";
+                });
+        }
+    </script>
+  
   <script>
     $('#searchbox').autocomplete({
       source: function (request, response) {
