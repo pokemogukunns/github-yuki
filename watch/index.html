@@ -186,6 +186,68 @@
                 document.getElementById('video-title').textContent = 'ビデオIDが見つかりません';
             }
         };
+  function getRelatedVideos() {
+            const videoId = getCurrentVideoId(); // URLから動画IDを抽出
+
+            if (!videoId) {
+                alert("動画IDが見つかりません！");
+                return;
+            }
+
+            // 関連動画を取得するAPIのURL
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&relatedToVideoId=${videoId}&type=video&key=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.items.length > 0) {
+                        displayRelatedVideos(data.items); // 関連動画を表示
+                    } else {
+                        document.getElementById('relatedVideoList').innerText = "関連動画が見つかりませんでした";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching related videos:', error);
+                    document.getElementById('relatedVideoList').innerText = "エラーが発生しました";
+                });
+        }
+
+        // 関連動画をHTMLに表示する関数
+        function displayRelatedVideos(videos) {
+            const relatedVideoList = document.getElementById('relatedVideoList');
+            relatedVideoList.innerHTML = ''; // 現在のコンテンツをクリア
+
+            videos.forEach(video => {
+                const title = video.snippet.title;
+                const videoId = video.id.videoId;
+                const thumbnailUrl = video.snippet.thumbnails.medium.url;
+                const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+                const videoItem = document.createElement('div');
+                videoItem.classList.add('video-item');
+
+                const videoLink = document.createElement('a');
+                videoLink.href = videoUrl;
+                videoLink.target = '_blank'; // 新しいタブで開く
+
+                const thumbnail = document.createElement('img');
+                thumbnail.src = thumbnailUrl;
+                thumbnail.alt = title;
+
+                const videoTitle = document.createElement('h3');
+                videoTitle.innerText = title;
+
+                videoLink.appendChild(thumbnail);
+                videoLink.appendChild(videoTitle);
+                videoItem.appendChild(videoLink);
+                relatedVideoList.appendChild(videoItem);
+            });
+        }
+
+        // ページが読み込まれたら関連動画を取得
+        window.onload = function() {
+            getRelatedVideos();
+        };
     </script>
 
 
