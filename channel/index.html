@@ -42,7 +42,6 @@
                 </div>
             </div>
             <div class="pure-g">
-                {% for result in results %}
                 <div class="pure-u-1 pure-u-md-1-4">
                     <div class="h-box">
 　　　　　　　　　　　　　　　<div id="video-container"></div>
@@ -54,25 +53,15 @@
                                 <p class="video-data" dir="auto">{{result["published"]}}</p>
                             </div>
                         </div>
-                        {% elif result["type"] == "channel" %}
                         <a href="/github-yuki/channel#{{result["id"]}}">
                             <center>
                                 <img loading="lazy" tabindex="-1" style="width:56.25%" src="{{result["thumbnail"]}}"> 
                             </center>
                             <p dir="auto">{{result["author"]}}</p>
                         </a>
-                        {% elif result["type"] == "playlist" %}
-                        <a style="width:100%" href="/github-yuki/playlist?list={{result["id"]}}">
-                            <div class="thumbnail"> 
-                                <img loading="lazy" tabindex="-1" class="thumbnail" src="{% if proxy == 'True' %}/thumbnail?v={{ result['thumbnail'] }}{% else %}https://img.youtube.com/vi/{{ result['thumbnail'] }}/0.jpg{% endif %}">
-                                <p class="length">{{result["count"]}}個の動画</p> 
-                            </div>
-                            <p dir="auto">{{result["title"]}}</p> 
-                        </a>
-                        {% endif %}
+                        <div id="playlist-container"></div>
                     </div>
                 </div>
-                {% endfor %}
             </div>
         </div>
     </div> 
@@ -181,7 +170,39 @@ function fetchChannelVideos(identifier, apiKey) {
             console.error('動画取得時にエラーが発生しました:', error);
         });
 }
+// チャンネルプレイリストを取得する関数
+function fetchChannelPlaylists(identifier, apiKey) {
+    const url = `https://www.googleapis.com/youtube/v3/playlists?key=${apiKey}&channelId=${identifier}&part=snippet&maxResults=10`;
 
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.items && data.items.length > 0) {
+                const playlistContainer = document.getElementById('playlist-container');
+                playlistContainer.innerHTML = ''; // コンテナをクリア
+
+                data.items.forEach(playlist => {
+                    const playlistId = playlist.id;
+                    const title = playlist.snippet.title;
+                    const thumbnailUrl = playlist.snippet.thumbnails.medium.url;
+
+                    const playlistElement = `
+                        <div class="playlist-item">
+                            <img src="${thumbnailUrl}" alt="${title}">
+                            <p><a href="https://pokemogukunns.github.io/github-yuki/playlist/?list=${playlistId}" target="_blank">${title}</a></p>
+                        </div>
+                    `;
+                    playlistContainer.innerHTML += playlistElement;
+                });
+            } else {
+                document.getElementById('playlist-container').textContent = 'プレイリストが見つかりませんでした';
+            }
+        })
+        .catch(error => {
+            console.error('プレイリスト取得時にエラーが発生しました:', error);
+        });
+}
+        
 // ページ読み込み時にチャンネルIDまたはハンドルを取得して情報を表示
 window.onload = function() {
     const identifier = getChannelIdFromUrl();
