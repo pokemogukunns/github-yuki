@@ -38,7 +38,7 @@
           <a href="javascript:{navigator.share({title: '動画を共有',text: '{{videotitle}}',url: location.href,})}">動画を共有</a><br> 
           <hr> </div> <div class="pure-u-1 pure-u-lg-3-5">
             <div class="h-box">
-            <a href="/github-yuki/channel#{{authorid}}" style="display:block;width:fit-content;width:-moz-fit-content">
+            <a href="/github-yuki/channel#${channelName}"></span>" style="display:block;width:fit-content;width:-moz-fit-content">
               <div class="channel-profile">
                 
                 <img id="channelIcon" src="" alt="チャンネルアイコン" width="50" height="50" style="display:none;">
@@ -49,14 +49,15 @@
             </div> </div> 
         <div class="pure-u-1 pure-u-lg-1-5">
           <!--自動再生<input type="checkbox" id="autonext" onchange="checkautoplay()"><br>-->
-          ループ再生<input type="checkbox" id="loop" onchange="changeloop()"> {% for re in res %} <a href="/github-yuki/watch?v={{ re['id'] }}">
+          
+          ループ再生<input type="checkbox" id="loop" onchange="changeloop()"><a href="/github-yuki/watch?v=${videoId}">
             <div class="thumbnail">
               <img loading="lazy" class="thumbnail" src="https://img.youtube.com/vi/${videoId}/0.jpg">
             </div>
             <div class="related-video" id="relatedVideoList">
               </biv>
             <p style="width:100%">{{re["title"]}}</p> </a><br> 
-          <a href="/github-yuki/channel#{{re['authorId']}}">{{re["author"]}}</a>{% endfor %} </div> </div> </div> </div> 
+          <a href="/github-yuki/channel#{{re['authorId']}}">{{re["author"]}}</a></div> </div> </div> </div> 
     </div>
     <div class="pure-u-1 pure-u-md-2-24"></div> 
   </div>
@@ -197,8 +198,12 @@
                     document.getElementById('relatedVideoList').innerText = "エラーが発生しました";
                 });
         }
+    </script>
 
-        // 関連動画をHTMLに表示する関数
+
+<!--
+    <script>
+    // 関連動画をHTMLに表示する関数
         function displayRelatedVideos(videos) {
             const relatedVideoList = document.getElementById('relatedVideoList');
             relatedVideoList.innerHTML = ''; // 現在のコンテンツをクリア
@@ -233,10 +238,8 @@
         // ページが読み込まれたら関連動画を取得
         window.onload = function() {
             getRelatedVideos();
-        };
-    </script>
-
-
+        }; 
+</script>-->
 
 
 
