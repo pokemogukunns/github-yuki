@@ -187,5 +187,15 @@
             }
         };
     </script>
+  <script>
+        // サーバーサイドから取得した動画のURL（テンプレートエンジンで埋め込み）
+        var videoUrl = "{{ videourls[0] }}";
+
+        // 動画のsourceタグにURLを設定
+        document.getElementById('videoSource').src = videoUrl;
+
+        // 動画プレーヤーの再読み込み
+        document.getElementById('videoPlayer').load();
+    </script>
 </body>
 </html>
