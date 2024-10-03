@@ -29,8 +29,8 @@
             <div class="pure-g h-box">
                 <div class="pure-u-2-3">
                     <div class="channel-profile">
-                        <img src="{{channelicon}}">
-                        <span>{{channelname}}</span>
+                        <img id="channel-icon" src="{{channelicon}}">
+                        <h1 id="channel-name">{{channelname}}</h1>
                     </div>
                 </div>
             </div>
@@ -62,7 +62,7 @@
                             </div>
                         </div>
                         {% elif result["type"] == "channel" %}
-                        <a href="/github-yuki/channel/{{result["id"]}}">
+                        <a href="/github-yuki/channel#{{result["id"]}}">
                             <center>
                                 <img loading="lazy" tabindex="-1" style="width:56.25%" src="{{result["thumbnail"]}}"> 
                             </center>
@@ -99,5 +99,45 @@
             delay: 300
         });
     </script>
+    <script>
+    const apiKey = 'AIzaSyBU2xE_JHvB6wag3tMfhxXpg2Q_W8xnM-I';  // ここにあなたのAPIキーを入力してください
+
+    function getChannelIdFromUrl() {
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#')) {
+            return hash.substring(1); // #の後のチャンネルIDを取得
+        }
+        return null;
+    }
+
+    function fetchChannelInfo(channelId) {
+        const url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${apiKey}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.items && data.items.length > 0) {
+                    const channel = data.items[0].snippet;
+                    document.getElementById('channel-name').textContent = channel.title;
+                    document.getElementById('channel-icon').src = channel.thumbnails.default.url;
+                } else {
+                    document.getElementById('channel-name').textContent = 'チャンネルが見つかりませんでした';
+                }
+            })
+            .catch(error => {
+                console.error('エラーが発生しました:', error);
+            });
+    }
+
+    // ページ読み込み時にチャンネルIDを取得して情報を表示
+    window.onload = function() {
+        const channelId = getChannelIdFromUrl();
+        if (channelId) {
+            fetchChannelInfo(channelId);
+        } else {
+            document.getElementById('channel-name').textContent = 'チャンネルIDが見つかりません';
+        }
+    };
+</script>
 </body>
 </html>
