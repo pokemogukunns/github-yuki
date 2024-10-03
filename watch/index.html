@@ -33,12 +33,12 @@
       </div> 
            <div class="h-box"> <h1 id="video-title"></h1> </div> <div class="pure-g"> 
         <div class="pure-u-1 pure-u-lg-1-5"> 
-          <a herf="https://youtube-dl-server-lolo.onrender.com"><div id="stream-url" target="_blank">ダウンロード</div></a>
+          <a herf="https://youtube-dl-server-lolo.onrender.com/${YOUTUBE_DL_SERVER}/download?url=${encodeURIComponent(youtubeUrl)}" id="stream-url" target="_blank">ダウンロード</a>
           <a href="javascript:{navigator.share({title: '動画を共有',text: '{{videotitle}}',url: location.protocol+'//'+document.domain+'/watch?v={{ videoid }}'+'&t='+Math.floor(document.getElementById('player').currentTime),})}">現時点の動画を共有</a><br>
           <a href="javascript:{navigator.share({title: '動画を共有',text: '{{videotitle}}',url: location.href,})}">動画を共有</a><br> 
           <hr> </div> <div class="pure-u-1 pure-u-lg-3-5">
             <div class="h-box">
-            <a href="/github-yuki/channel#${channelName}"></span>" style="display:block;width:fit-content;width:-moz-fit-content">
+            <a href="/github-yuki/channel#${channelName}"></span>
               <div class="channel-profile">
                 
                 <img id="channelIcon" src="" alt="チャンネルアイコン" width="50" height="50" style="display:none;">
@@ -198,6 +198,15 @@
                     document.getElementById('relatedVideoList').innerText = "エラーが発生しました";
                 });
         }
+  const YOUTUBE_DL_SERVER = 'https://youtube-dl-server-lolo.onrender.com';
+  function fetchStreamUrl(videoId) {
+    const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    const apiUrl = `${YOUTUBE_DL_SERVER}/download?url=${encodeURIComponent(youtubeUrl)}`;
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+      if (data.url) {
+      downloadButton.setAttribute('download', 'video.mp4');
     </script>
 
 
