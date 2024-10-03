@@ -33,7 +33,7 @@
       </div> 
            <div class="h-box"> <h1 id="video-title"></h1> </div> <div class="pure-g"> 
         <div class="pure-u-1 pure-u-lg-1-5"> 
-          <div id="stream-url" target="_blank">ダウンロード</div>
+          <a herf="https://youtube-dl-server-lolo.onrender.com"><div id="stream-url" target="_blank">ダウンロード</div></a>
           <a href="javascript:{navigator.share({title: '動画を共有',text: '{{videotitle}}',url: location.protocol+'//'+document.domain+'/watch?v={{ videoid }}'+'&t='+Math.floor(document.getElementById('player').currentTime),})}">現時点の動画を共有</a><br>
           <a href="javascript:{navigator.share({title: '動画を共有',text: '{{videotitle}}',url: location.href,})}">動画を共有</a><br> 
           <hr> </div> <div class="pure-u-1 pure-u-lg-3-5">
@@ -51,7 +51,7 @@
           <!--自動再生<input type="checkbox" id="autonext" onchange="checkautoplay()"><br>-->
           ループ再生<input type="checkbox" id="loop" onchange="changeloop()"> {% for re in res %} <a href="/github-yuki/watch?v={{ re['id'] }}">
             <div class="thumbnail">
-              <img loading="lazy" class="thumbnail" src="{% if proxy == "True" %}/thumbnail?v={{ re['id']}}{% else %}https://img.youtube.com/vi/${videoId}/0.jpg{% endif %}">
+              <img loading="lazy" class="thumbnail" src="https://img.youtube.com/vi/${videoId}/0.jpg">
             </div>
             <p style="width:100%">{{re["title"]}}</p> </a><br> 
           <a href="/github-yuki/channel#{{re['authorId']}}">{{re["author"]}}</a>{% endfor %} </div> </div> </div> </div> 
@@ -205,8 +205,8 @@
 
 
 
-
-  <script>
+<!--
+<script>
 // youtube-dl-serverのURLを設定
 const YOUTUBE_DL_SERVER = 'https://youtube-dl-server-lolo.onrender.com'; // 指定されたyoutube-dl-serverのアドレス
 
@@ -259,6 +259,6 @@ function getQueryParam(param) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(param);
 }
-    </script>
+</script>-->
 </body>
 </html>
