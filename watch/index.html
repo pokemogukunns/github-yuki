@@ -177,23 +177,7 @@
                 });
         }
 
-        // ページ読み込み時にビデオIDを取得して処理を開始
-        window.onload = function() {
-            const videoId = getQueryParam('v');
-            if (videoId) {
-                fetchVideoDetails(videoId);
-            } else {
-                document.getElementById('video-title').textContent = 'ビデオIDが見つかりません';
-            }
-        };
-  function getRelatedVideos() {
-            const videoId = getCurrentVideoId(); // URLから動画IDを抽出
-
-            if (!videoId) {
-                alert("動画IDが見つかりません！");
-                return;
-            }
-
+        
             // 関連動画を取得するAPIのURL
             const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&relatedToVideoId=${videoId}&type=video&key=${apiKey}`;
 
