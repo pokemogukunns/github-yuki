@@ -89,8 +89,8 @@
                         const videoDescription = snippet.description;
 
                         // ビデオタイトルと概要を表示
-                        document.getElementById('video-title').textContent = `ビデオタイトル: ${videoTitle}`;
-                        document.getElementById('video-description').textContent = `概要: ${videoDescription}`;
+                        document.getElementById('video-title').textContent = `${videoTitle}`;
+                        document.getElementById('video-description').textContent = `${videoDescription}`;
                         
                         // チャンネル情報を取得
                         fetchChannelInfo(channelId);
