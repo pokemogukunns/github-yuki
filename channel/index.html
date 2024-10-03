@@ -100,70 +100,104 @@
         });
     </script>
     <script>
-    const apiKeys = [
-            'AIzaSyCfLrK2FPzEZllvwhjmugZ8Bwvzp6GRVpU',
-            'AIzaSyDd2Bw7VOBD1vmLWHAsQ1PcKKFdB3jvmFE',
-            'AIzaSyB0Ykrh1wzhafrD3aYEfVlGnEohMTM7X7E',
-            'AIzaSyBi4w3SxmDe9AWpH12AUBEN_YLgJQFnQpY'
-        ];
-        let currentKeyIndex = 0; // 現在使用中のAPIキーのインデックス
+const apiKeys = [
+    'AIzaSyCfLrK2FPzEZllvwhjmugZ8Bwvzp6GRVpU',
+    'AIzaSyDd2Bw7VOBD1vmLWHAsQ1PcKKFdB3jvmFE',
+    'AIzaSyB0Ykrh1wzhafrD3aYEfVlGnEohMTM7X7E',
+    'AIzaSyBi4w3SxmDe9AWpH12AUBEN_YLgJQFnQpY'
+];
+let currentKeyIndex = 0; // 現在使用中のAPIキーのインデックス
 
+// URLからチャンネルIDまたはチャンネルハンドルを取得する関数
+function getChannelIdFromUrl() {
+    const hash = window.location.hash;
+    if (hash && hash.includes('#')) {
+        const identifier = hash.split('#')[1]; // #の後の部分を取得
+        return identifier ? identifier : null;
+    }
+    return null;
+}
 
-    // URLからチャンネルIDまたはチャンネルハンドルを取得する関数
-    function getChannelIdFromUrl() {
-        const hash = window.location.hash;
-        if (hash && hash.includes('#')) {
-            const identifier = hash.split('#')[1]; // #の後の部分を取得
-            return identifier ? identifier : null;
-        }
-        return null;
+// チャンネル情報を取得する関数
+function fetchChannelInfo(identifier) {
+    const apiKey = apiKeys[currentKeyIndex];
+    let url = '';
+
+    if (identifier.startsWith('@')) {
+        // ハンドルの場合
+        url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&forUsername=${identifier.substring(1)}&key=${apiKey}`;
+    } else {
+        // チャンネルIDの場合
+        url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${identifier}&key=${apiKey}`;
     }
 
-    // チャンネル情報を取得する関数
-    function fetchChannelInfo(identifier) {
-        const apiKey = apiKeys[currentKeyIndex];
-        let url = '';
-        
-        if (identifier.startsWith('@')) {
-            // ハンドルの場合
-            url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&forUsername=${identifier.substring(1)}&key=${apiKey}`;
-        } else {
-            // チャンネルIDの場合
-            url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${identifier}&key=${apiKey}`;
-        }
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.items && data.items.length > 0) {
+                const channel = data.items[0].snippet;
+                document.getElementById('channel-name').textContent = channel.title;
+                document.getElementById('channel-icon').src = channel.thumbnails.default.url;
+                // 動画リストを取得
+                fetchChannelVideos(identifier, apiKey);
+            } else {
+                document.getElementById('channel-name').textContent = 'チャンネルが見つかりませんでした';
+            }
+        })
+        .catch(error => {
+            console.error('エラーが発生しました:', error);
+            if (currentKeyIndex < apiKeys.length - 1) {
+                // 次のAPIキーを試す
+                currentKeyIndex++;
+                fetchChannelInfo(identifier); // 再度リクエスト
+            } else {
+                document.getElementById('channel-name').textContent = 'すべてのAPIキーが失敗しました';
+            }
+        });
+}
 
-        fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.items && data.items.length > 0) {
-                    const channel = data.items[0].snippet;
-                    document.getElementById('channel-name').textContent = channel.title;
-                    document.getElementById('channel-icon').src = channel.thumbnails.default.url;
-                } else {
-                    document.getElementById('channel-name').textContent = 'チャンネルが見つかりませんでした';
-                }
-            })
-            .catch(error => {
-                console.error('エラーが発生しました:', error);
-                if (currentKeyIndex < apiKeys.length - 1) {
-                    // 次のAPIキーを試す
-                    currentKeyIndex++;
-                    fetchChannelInfo(identifier); // 再度リクエスト
-                } else {
-                    document.getElementById('channel-name').textContent = 'すべてのAPIキーが失敗しました';
-                }
-            });
+// チャンネル動画を取得する関数
+function fetchChannelVideos(identifier, apiKey) {
+    const url = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${identifier}&part=snippet&order=date&maxResults=10`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            if (data.items && data.items.length > 0) {
+                const videoContainer = document.getElementById('video-container');
+                videoContainer.innerHTML = ''; // コンテナをクリア
+
+                data.items.forEach(video => {
+                    const videoId = video.id.videoId;
+                    const title = video.snippet.title;
+                    const thumbnailUrl = video.snippet.thumbnails.medium.url;
+
+                    const videoElement = `
+                        <div class="video-item">
+                            <img src="${thumbnailUrl}" alt="${title}">
+                            <p><a href="https://pokemogukunns.github.io/github-yuki/watch/?v=${videoId}" target="_blank">${title}</a></p>
+                        </div>
+                    `;
+                    videoContainer.innerHTML += videoElement;
+                });
+            } else {
+                document.getElementById('video-container').textContent = '動画が見つかりませんでした';
+            }
+        })
+        .catch(error => {
+            console.error('動画取得時にエラーが発生しました:', error);
+        });
+}
+
+// ページ読み込み時にチャンネルIDまたはハンドルを取得して情報を表示
+window.onload = function() {
+    const identifier = getChannelIdFromUrl();
+    if (identifier) {
+        fetchChannelInfo(identifier);
+    } else {
+        document.getElementById('channel-name').textContent = 'チャンネルIDまたはハンドルが見つかりません';
     }
-
-    // ページ読み込み時にチャンネルIDまたはハンドルを取得して情報を表示
-    window.onload = function() {
-        const identifier = getChannelIdFromUrl();
-        if (identifier) {
-            fetchChannelInfo(identifier);
-        } else {
-            document.getElementById('channel-name').textContent = 'チャンネルIDまたはハンドルが見つかりません';
-        }
-    };
-　　　　</script>
+};
+</script>
 </body>
 </html>
