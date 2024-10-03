@@ -58,43 +58,67 @@
     <div class="pure-u-1 pure-u-md-2-24"></div> 
   </div>
 　<script>
-        const apiKey = 'AIzaSyBU2xE_JHvB6wag3tMfhxXpg2Q_W8xnM-I'; // YouTube Data APIキーを入力
+        // APIキーのリスト（優先順）
+        const apiKeys = [
+            'AIzaSyBU2xE_JHvB6wag3tMfhxXpg2Q_W8xnM-I',
+            'AIzaSyDophAQuyyiBr8h0nypEwXUKozH-BEswD0',
+            'AIzaSyDZNkyC-AtROwMBpLfevIvqYk-Gfi8ZOeo',
+            'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+        ];
+        let currentKeyIndex = 0; // 現在使用中のAPIキーのインデックス
 
-        // カスタムURLから動画IDを抽出する関数
-        function extractVideoId(url) {
-            const urlObj = new URL(url); // 入力されたURLを解析
-            const videoId = urlObj.searchParams.get('v'); // "?v=動画ID" の部分を取得
-
-            return videoId;
+        // URLクエリパラメータから値を取得する関数
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
         }
 
-        // YouTube APIを使って動画タイトルを取得する関数
-        function getVideoTitleFromUrl() {
-            const videoUrl = document.getElementById('videoUrl').value;
-            const videoId = extractVideoId(videoUrl); // URLから動画IDを抽出
-
-            if (!videoId) {
-                alert("正しい動画のURLを入力してください！");
-                return;
-            }
-
-            const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`;
+        // チャンネル情報を取得する関数
+        function fetchChannelInfo(channelId) {
+            const apiKey = apiKeys[currentKeyIndex]; // 現在のAPIキーを使用
+            const url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${apiKey}`;
 
             fetch(url)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) { // もしリクエストが失敗した場合
+                        throw new Error('APIリクエストに失敗しました');
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    if (data.items.length > 0) {
-                        const title = data.items[0].snippet.title;
-                        document.getElementById('videotitle').innerText = title; // 動画タイトルを表示
+                    if (data.items && data.items.length > 0) {
+                        const channel = data.items[0].snippet;
+                        document.getElementById('channel-name').textContent = channel.title;
+                        const iconElement = document.getElementById('channel-icon');
+                        iconElement.src = channel.thumbnails.default.url;
+                        iconElement.style.display = 'block'; // アイコンを表示
                     } else {
-                        document.getElementById('videotitle').innerText = "動画が見つかりませんでした";
+                        document.getElementById('channel-name').textContent = 'チャンネルが見つかりませんでした';
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching video title:', error);
-                    document.getElementById('videotitle').innerText = "エラーが発生しました";
+                    console.error('エラーが発生しました:', error);
+                    if (currentKeyIndex < apiKeys.length - 1) {
+                        // 次のAPIキーを試す
+                        currentKeyIndex++;
+                        console.log(`APIキーを切り替えています。次のキー: ${currentKeyIndex + 1}`);
+                        fetchChannelInfo(channelId); // 再度リクエスト
+                    } else {
+                        // すべてのAPIキーが失敗した場合
+                        document.getElementById('channel-name').textContent = 'すべてのAPIキーが失敗しました';
+                    }
                 });
         }
+
+        // ページ読み込み時にクエリパラメータからビデオIDを取得してチャンネル情報を表示
+        window.onload = function() {
+            const videoId = getQueryParam('v');
+            if (videoId) {
+                fetchChannelInfo(videoId);
+            } else {
+                document.getElementById('channel-name').textContent = 'ビデオIDが見つかりません';
+            }
+        };
     </script>
   
   <script>
