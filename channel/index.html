@@ -100,18 +100,28 @@
         });
     </script>
     <script>
-    const apiKey = 'AIzaSyBU2xE_JHvB6wag3tMfhxXpg2Q_W8xnM-I';  // ここにあなたのAPIキーを入力してください
+    const apiKey = 'AIzaSyBU2xE_JHvB6wag3tMfhxXpg2Q_W8xnM-I';  // APIキーを設定
 
+    // URLからチャンネルIDまたはチャンネルハンドルを取得する関数
     function getChannelIdFromUrl() {
         const hash = window.location.hash;
-        if (hash && hash.startsWith('#')) {
-            return hash.substring(1); // #の後のチャンネルIDを取得
+        if (hash && hash.includes('#')) {
+            const identifier = hash.split('#')[1]; // #の後の部分を取得
+            return identifier ? identifier : null;
         }
         return null;
     }
 
-    function fetchChannelInfo(channelId) {
-        const url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${apiKey}`;
+    // チャンネル情報を取得する関数
+    function fetchChannelInfo(identifier) {
+        let url = '';
+        if (identifier.startsWith('@')) {
+            // ハンドルの場合
+            url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&forUsername=${identifier.substring(1)}&key=${apiKey}`;
+        } else {
+            // チャンネルIDの場合
+            url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${identifier}&key=${apiKey}`;
+        }
 
         fetch(url)
             .then(response => response.json())
@@ -129,15 +139,15 @@
             });
     }
 
-    // ページ読み込み時にチャンネルIDを取得して情報を表示
+    // ページ読み込み時にチャンネルIDまたはハンドルを取得して情報を表示
     window.onload = function() {
-        const channelId = getChannelIdFromUrl();
-        if (channelId) {
-            fetchChannelInfo(channelId);
+        const identifier = getChannelIdFromUrl();
+        if (identifier) {
+            fetchChannelInfo(identifier);
         } else {
-            document.getElementById('channel-name').textContent = 'チャンネルIDが見つかりません';
+            document.getElementById('channel-name').textContent = 'チャンネルIDまたはハンドルが見つかりません';
         }
     };
-</script>
+　　　　</script>
 </body>
 </html>
