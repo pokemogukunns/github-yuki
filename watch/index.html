@@ -28,12 +28,12 @@
       </div> 
       <div id="player-container" class="h-box"> 
         <video style="outline:none;width:100%;background-color:#000;" id="player" controls>
-          <source src="{% if proxy == 'True' %}/thumbnail?v=${videoId}{% else %}https://img.youtube.com/vi/${videoId}/0.jpg{% endif %}">
+          <source src="https://img.youtube.com/vi/${videoId}/0.jpg">
         </video>
       </div> 
            <div class="h-box"> <h1 id="video-title"></h1> </div> <div class="pure-g"> 
         <div class="pure-u-1 pure-u-lg-1-5"> 
-          <a id="stream-link" href="#" style="display:none;" target="_blank">ダウンロード</a>
+          <div id="stream-url" target="_blank"></div>
           <a href="javascript:{navigator.share({title: '動画を共有',text: '{{videotitle}}',url: location.protocol+'//'+document.domain+'/watch?v={{ videoid }}'+'&t='+Math.floor(document.getElementById('player').currentTime),})}">現時点の動画を共有</a><br>
           <a href="javascript:{navigator.share({title: '動画を共有',text: '{{videotitle}}',url: location.href,})}">動画を共有</a><br> 
           <hr> </div> <div class="pure-u-1 pure-u-lg-3-5">
@@ -188,14 +188,58 @@
         };
     </script>
   <script>
-        // サーバーサイドから取得した動画のURL（テンプレートエンジンで埋め込み）
-        var videoUrl = "{{ videourls[0] }}";
+// youtube-dl-serverのURLを設定
+const YOUTUBE_DL_SERVER = 'https://youtube-dl-server-lolo.onrender.com'; // 指定されたyoutube-dl-serverのアドレス
 
-        // 動画のsourceタグにURLを設定
-        document.getElementById('videoSource').src = videoUrl;
+// ストリームURLを取得してHTMLに表示する関数
+function fetchStreamUrl(videoId) {
+    const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    const apiUrl = `${YOUTUBE_DL_SERVER}/download?url=${encodeURIComponent(youtubeUrl)}`; // youtube-dl-serverのAPIエンドポイント
 
-        // 動画プレーヤーの再読み込み
-        document.getElementById('videoPlayer').load();
+    // youtube-dl-serverを使ってストリームURLを取得
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.url) {
+                // ストリームURLが取得できた場合
+                const streamUrl = data.url;
+                const streamUrlElement = document.getElementById('stream-url');
+                
+                // ダウンロードボタンを生成
+                const downloadButton = document.createElement('a');
+                
+                // aタグの属性を設定
+                downloadButton.href = streamUrl;
+                downloadButton.textContent = 'ダウンロード';
+                downloadButton.classList.add('download-button'); // クラスを追加（CSS用）
+                downloadButton.setAttribute('download', 'video.mp4'); // ダウンロード属性を設定
+
+                // ダウンロードボタンをHTMLに追加
+                streamUrlElement.appendChild(downloadButton);
+            } else {
+                console.error('ストリームURLが取得できませんでした');
+            }
+        })
+        .catch(error => {
+            console.error('エラーが発生しました:', error);
+        });
+}
+
+// ページ読み込み時にビデオIDを取得して処理を開始
+window.onload = function() {
+    const videoId = getQueryParam('v'); // URLから動画IDを取得
+    if (videoId) {
+        fetchStreamUrl(videoId); // ストリームURLを取得
+    } else {
+        document.getElementById('video-title').textContent = 'ビデオIDが見つかりません';
+    }
+};
+
+// URLクエリパラメータから値を取得する関数
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
     </script>
 </body>
 </html>
