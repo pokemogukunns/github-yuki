@@ -1,39 +1,166 @@
+<!DOCTYPE html>
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://pyscript.net/alpha/pyscript.css"/>
-  <script defer src="https://pyscript.net/alpha/pyscript.js"></script>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <link rel="stylesheet" href="https://pokemogukunns.github.io/keiryouka/css/pure-min.css">
   <link rel="stylesheet" href="https://pokemogukunns.github.io/keiryouka/css/grids-responsive-min.css">
   <link rel="stylesheet" href="https://pokemogukunns.github.io/keiryouka/css/ionicons.min.css">
   <link rel="stylesheet" href="https://pokemogukunns.github.io/keiryouka/css/default.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="/main.js" async></script>
   <script src="/cache.js" async></script>
 </head>
-<body>
-  </body>
-<body class="no-theme"> <span style="display:none" id="dark_mode_pref"></span> <div class="pure-g"> <div class="pure-u-1 pure-u-md-2-24"></div> <div class="pure-u-1 pure-u-md-20-24" id="contents"> <div class="pure-g navbar h-box"> <div class="pure-u-1 pure-u-md-12-24 searchbar">
-  <form class="pure-form" action="./search" method="get"> <fieldset> <input type="search" id="searchbox" autocomplete="on" autocorrect="on" autocapitalize="none" spellcheck="false" name="q" placeholder="検索" title="検索" value="{{ word }}"> </fieldset> </form> </div> </div> <div class="pure-g"> {% for result in results %} <div class="pure-u-1 pure-u-md-1-4">
-    <div class="h-box"> {% if result["type"] == "video" %} <a style="width:100%" href="./watch?v={{ result['id'] }}"> <div class="thumbnail"> 
-      <img loading="lazy" class="thumbnail" src="{% if proxy == "True" %}/thumbnail?v={{ result['id'] }}{% else %}https://img.youtube.com/vi/{{ result['id'] }}/0.jpg{% endif %}" onerror="document.cookie = 'proxy=True;max-age=2592000;';"> <p class="length">{{result["length"]}}</p> </div> <p dir="auto">{{ result['title'] }}</p> </a> <div class="video-card-row flexible">
-        <a href=/github-yuki/channel#{{result['authorId']}}">{{result["author"]}}</a> </div> <div class="video-card-row flexible"> <div class="flex-left"> <p class="video-data" dir="auto">{{result["published"]}}</p> </div> 
-        </div> {% elif result["type"] == "channel" %} <a href="./{{result["id"]}}"> <center> <img loading="lazy" tabindex="-1" style="width:56.25%" src="{{result["thumbnail"]}}"> </center> <p dir="auto">{{result["author"]}}</p> 
-        </a> {% elif result["type"] == "playlist" %} <a style="width:100%" href="./playlist?list={{result["id"]}}"> <div class="thumbnail"> <img loading="lazy" tabindex="-1" class="thumbnail" src="{% if proxy == "True" %}/thumbnail?v={{ result['thumbnail'] }}{% else %}https://img.youtube.com/vi/{{ result['thumbnail'] }}/0.jpg{% endif %}"> <p class="length">{{result["count"]}}個の動画</p> </div> <p dir="auto">{{result["title"]}}</p> </a> {% endif %} </div> </div>{% endfor %} </div> </div> </div> <div class="pure-g h-box"> <div class="pure-u-1 pure-u-lg-1-5"> </div> <div class="pure-u-1 pure-u-lg-3-5"></div> <div class="pure-u-1 pure-u-lg-1-5" style="text-align:right"> <a href="{{next}}"> 次のページ </a> </div> </div> 
-  <script>
-    $('#searchbox').autocomplete({
-        source: function (request, response) {
-            var url = "/suggest?keyword=" + request.term;
+<body class="no-theme">
+  <div class="pure-g"> 
+    <div class="pure-u-1 pure-u-md-2-24"></div> 
+    <div class="pure-u-1 pure-u-md-20-24" id="contents"> 
+      <div class="pure-g navbar h-box"> 
+        <div class="pure-u-1 pure-u-md-12-24 searchbar">
+          <form class="pure-form" action="/github-yuki/search" method="get"> 
+            <fieldset> 
+              <input type="search" id="searchbox" autocomplete="on" autocorrect="on" autocapitalize="none" spellcheck="false" name="q" placeholder=“${word}"></span>
+            </fieldset> 
+          </form> 
+        </div> 
+      </div> 
+      <div class="pure-g" id="results"></div>
+      
+      <!--<div class="pure-g"> 
+        {% for result in results %}
+          <div class="pure-u-1 pure-u-md-1-4">
+            <div class="h-box"> 
+              {% if result["type"] == "video" %}
+                <a style="width:100%" href="/github-yuki/watch?v={{ result['id'] }}"> 
+                  <div class="thumbnail"> 
+                    <img loading="lazy" class="thumbnail" src="{% if proxy == "True" %}/thumbnail?v={{ result['id'] }}{% else %}https://img.youtube.com/vi/{{ result['id'] }}/0.jpg{% endif %}" onerror="document.cookie = 'proxy=True;max-age=2592000;';"> 
+                    <p class="length">{{result["length"]}}</p> 
+                  </div> 
+                  <p dir="auto">{{ result['title'] }}</p> 
+                </a>
+              {% endif %}
+              <!-- 他の条件分岐 -->
+            </div>
+          </div>
+        {% endfor %}
+      </div> 
+      <div class="pure-g h-box"> 
+        <div class="pure-u-1 pure-u-lg-1-5"></div> 
+        <div class="pure-u-1 pure-u-lg-3-5"></div> 
+        <div class="pure-u-1 pure-u-lg-1-5" style="text-align:right"> 
+          <a id="next-page" href="#">次のページ</a> 
+        </div> 
+      </div> -->
+
+       <script>
+        // YouTube Data APIのAPIキーを設定
+        const apiKey = 'AIzaSyCfLrK2FPzEZllvwhjmugZ8Bwvzp6GRVpU'; // ここにAPIキーを挿入
+
+        // URLのクエリパラメータから検索ワードを取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('list');
+        
+        // APIリクエスト用のページトークン
+        let nextPageToken = '';
+
+        // YouTube検索関数
+        async function searchYouTube(query, pageToken = '') {
+          const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=${encodeURIComponent(query)}&key=${apiKey}&pageToken=${pageToken}`;
+          
+          try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            nextPageToken = data.nextPageToken;
+            displayResults(data.items);
+          } catch (error) {
+            console.error('Error fetching data:', error);
+            document.getElementById('results').innerHTML = '<p>データの取得中にエラーが発生しました。</p>';
+          }
+        }
+
+        // 検索結果を表示する関数
+        function displayResults(items) {
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML = ''; // 初期化
+
+  if (items.length === 0) {
+    resultsDiv.innerHTML = '<p>結果が見つかりませんでした。</p>';
+    return;
+  }
+
+  items.forEach(item => {
+    let url, title, thumbnailUrl;
+
+    if (item.id.kind === "youtube#video") {
+      // 動画の場合
+      const videoId = item.id.videoId;
+      title = item.snippet.title;
+      thumbnailUrl = item.snippet.thumbnails.default.url;
+      url = `/github-yuki/watch/?v=${videoId}`;  // 動画URLを変更
+    } else if (item.id.kind === "youtube#channel") {
+      // チャンネルの場合
+      const channelId = item.id.channelId;
+      title = item.snippet.title;
+      thumbnailUrl = item.snippet.thumbnails.default.url;
+      url = `/github-yuki/channel#${channelId}`;  // チャンネルURLを変更
+    }
+
+    const resultItem = `
+      <div class="pure-u-1 pure-u-md-1-4">
+        <div class="h-box">
+          <a href="${url}" target="_blank">
+            <div class="thumbnail">
+              <img loading="lazy" src="${thumbnailUrl}" alt="${title}">
+            </div>
+            <p>${title}</p>
+          </a>
+        </div>
+      </div>
+    `;
+    resultsDiv.innerHTML += resultItem;
+  });
+}
+
+
+        // ページがロードされたらYouTube検索を実行
+        window.onload = () => {
+          if (query) {
+            searchYouTube(query);
+          }
+        };
+
+        // 次のページリンクのクリックイベント
+        document.getElementById('next-page').addEventListener('click', (event) => {
+          event.preventDefault();
+          if (nextPageToken) {
+            searchYouTube(query, nextPageToken);
+          }
+        });
+      </script>
+      
+      <script>
+        function updateSpan() {
+          const searchValue = document.getElementById('searchbox').value;
+          document.getElementById('word-display').textContent = searchValue;
+        }
+        
+        $('#searchbox').autocomplete({
+          source: function (request, response) {
+            var url = "/suggest?keyword=" + encodeURIComponent(request.term);
             var xhr = new XMLHttpRequest();
             xhr.open("GET", url, true);
             xhr.onload = function() {
-                if (xhr.status === 200) {
-                    response(JSON.parse(xhr.responseText));
-                }
+              if (xhr.status === 200) {
+                response(JSON.parse(xhr.responseText));
+              }
             };
             xhr.send();
-        },
-        delay: 300
-    });
-</script>
-</body> </html>
+          },
+          delay: 300
+        });
+      </script>
+    </div>
+    <div class="pure-u-1 pure-u-md-2-24"></div> 
+  </div>
+</body>
+</html>
