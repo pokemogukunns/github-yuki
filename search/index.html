@@ -80,35 +80,47 @@
 
         // 検索結果を表示する関数
         function displayResults(items) {
-          const resultsDiv = document.getElementById('results');
-          resultsDiv.innerHTML = ''; // 初期化
+  const resultsDiv = document.getElementById('results');
+  resultsDiv.innerHTML = ''; // 初期化
 
-          if (items.length === 0) {
-            resultsDiv.innerHTML = '<p>結果が見つかりませんでした。</p>';
-            return;
-          }
+  if (items.length === 0) {
+    resultsDiv.innerHTML = '<p>結果が見つかりませんでした。</p>';
+    return;
+  }
 
-          items.forEach(item => {
-            const videoId = item.id.videoId || item.id.channelId;
-            const title = item.snippet.title;
-            const thumbnailUrl = item.snippet.thumbnails.default.url;
-            const videoUrl = `/github-yuki/watch/?v=${videoId}`;
+  items.forEach(item => {
+    let url, title, thumbnailUrl;
 
-            const resultItem = `
-              <div class="pure-u-1 pure-u-md-1-4">
-                <div class="h-box">
-                  <a href="${videoUrl}" target="_blank">
-                    <div class="thumbnail">
-                      <img loading="lazy" src="${thumbnailUrl}" alt="${title}">
-                    </div>
-                    <p>${title}</p>
-                  </a>
-                </div>
-              </div>
-            `;
-            resultsDiv.innerHTML += resultItem;
-          });
-        }
+    if (item.id.kind === "youtube#video") {
+      // 動画の場合
+      const videoId = item.id.videoId;
+      title = item.snippet.title;
+      thumbnailUrl = item.snippet.thumbnails.default.url;
+      url = `/github-yuki/watch/?v=${videoId}`;  // 動画URLを変更
+    } else if (item.id.kind === "youtube#channel") {
+      // チャンネルの場合
+      const channelId = item.id.channelId;
+      title = item.snippet.title;
+      thumbnailUrl = item.snippet.thumbnails.default.url;
+      url = `/github-yuki/channel/?c=${channelId}`;  // チャンネルURLを変更
+    }
+
+    const resultItem = `
+      <div class="pure-u-1 pure-u-md-1-4">
+        <div class="h-box">
+          <a href="${url}" target="_blank">
+            <div class="thumbnail">
+              <img loading="lazy" src="${thumbnailUrl}" alt="${title}">
+            </div>
+            <p>${title}</p>
+          </a>
+        </div>
+      </div>
+    `;
+    resultsDiv.innerHTML += resultItem;
+  });
+}
+
 
         // ページがロードされたらYouTube検索を実行
         window.onload = () => {
