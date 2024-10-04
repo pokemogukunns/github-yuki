@@ -88,13 +88,15 @@ const apiKeys = [
     'AIzaSyB0Ykrh1wzhafrD3aYEfVlGnEohMTM7X7E',
     'AIzaSyBi4w3SxmDe9AWpH12AUBEN_YLgJQFnQpY'
 ];
-let currentKeyIndex = 0; // 現在使用中のAPIキーのインデックス
+let currentKeyIndex = 0;
+let nextPageToken = ''; // 次のページ用のトークン
+let currentPage = 1; // 現在のページ
 
 // URLからチャンネルIDまたはチャンネルハンドルを取得する関数
 function getChannelIdFromUrl() {
     const hash = window.location.hash;
     if (hash && hash.includes('#')) {
-        const identifier = hash.split('#')[1]; // #の後の部分を取得
+        const identifier = hash.split('#')[1];
         return identifier ? identifier : null;
     }
     return null;
@@ -106,10 +108,8 @@ function fetchChannelInfo(identifier) {
     let url = '';
 
     if (identifier.startsWith('@')) {
-        // ハンドルの場合
         url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&forUsername=${identifier.substring(1)}&key=${apiKey}`;
     } else {
-        // チャンネルIDの場合
         url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${identifier}&key=${apiKey}`;
     }
 
@@ -120,8 +120,8 @@ function fetchChannelInfo(identifier) {
                 const channel = data.items[0].snippet;
                 document.getElementById('channel-name').textContent = channel.title;
                 document.getElementById('channel-icon').src = channel.thumbnails.default.url;
-                // 動画リストを取得
-                fetchChannelVideos(identifier, apiKey);
+                // 最初の50本を取得
+                fetchChannelVideos(identifier, apiKey, 50);
             } else {
                 document.getElementById('channel-name').textContent = 'チャンネルが見つかりませんでした';
             }
@@ -129,18 +129,20 @@ function fetchChannelInfo(identifier) {
         .catch(error => {
             console.error('エラーが発生しました:', error);
             if (currentKeyIndex < apiKeys.length - 1) {
-                // 次のAPIキーを試す
                 currentKeyIndex++;
-                fetchChannelInfo(identifier); // 再度リクエスト
+                fetchChannelInfo(identifier);
             } else {
                 document.getElementById('channel-name').textContent = 'すべてのAPIキーが失敗しました';
             }
         });
 }
 
-// チャンネル動画を取得する関数
-function fetchChannelVideos(identifier, apiKey) {
-    const url = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${identifier}&part=snippet&order=date&maxResults=10`;
+// チャンネル動画を取得する関数 (50本ごとに表示)
+function fetchChannelVideos(identifier, apiKey, maxResults = 50, pageToken = '') {
+    let url = `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${identifier}&part=snippet&type=video&order=date&maxResults=${maxResults}`;
+    if (pageToken) {
+        url += `&pageToken=${pageToken}`;
+    }
 
     fetch(url)
         .then(response => response.json())
@@ -149,19 +151,34 @@ function fetchChannelVideos(identifier, apiKey) {
                 const videoContainer = document.getElementById('video-container');
                 videoContainer.innerHTML = ''; // コンテナをクリア
 
-                data.items.forEach(video => {
+                data.items.forEach((video, index) => {
                     const videoId = video.id.videoId;
                     const title = video.snippet.title;
                     const thumbnailUrl = video.snippet.thumbnails.medium.url;
 
                     const videoElement = `
-                        <div class="video-item">
+                        <div class="video-item" style="display: inline-block; width: 18%;">
                             <img src="${thumbnailUrl}" alt="${title}">
-                            <p><a href="https://pokemogukunns.github.io/github-yuki/watch/?v=${videoId}" target="_blank">${title}</a></p>
+                            <p><a href="/github-yuki/watch/?v=${videoId}" target="_blank">${title}</a></p>
                         </div>
                     `;
                     videoContainer.innerHTML += videoElement;
+
+                    // 改行のための処理 (5個ごとに改行)
+                    if ((index + 1) % 5 === 0) {
+                        videoContainer.innerHTML += '<br>';
+                    }
                 });
+
+                // ページネーション用の nextPageToken を保存
+                nextPageToken = data.nextPageToken;
+
+                // 次のページボタンの表示設定
+                if (nextPageToken) {
+                    document.getElementById('next-page').style.display = 'block';
+                } else {
+                    document.getElementById('next-page').style.display = 'none';
+                }
             } else {
                 document.getElementById('video-container').textContent = '動画が見つかりませんでした';
             }
@@ -170,39 +187,18 @@ function fetchChannelVideos(identifier, apiKey) {
             console.error('動画取得時にエラーが発生しました:', error);
         });
 }
-// チャンネルプレイリストを取得する関数
-function fetchChannelPlaylists(identifier, apiKey) {
-    const url = `https://www.googleapis.com/youtube/v3/playlists?key=${apiKey}&channelId=${identifier}&part=snippet&maxResults=10`;
 
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data.items && data.items.length > 0) {
-                const playlistContainer = document.getElementById('playlist-container');
-                playlistContainer.innerHTML = ''; // コンテナをクリア
-
-                data.items.forEach(playlist => {
-                    const playlistId = playlist.id;
-                    const title = playlist.snippet.title;
-                    const thumbnailUrl = playlist.snippet.thumbnails.medium.url;
-
-                    const playlistElement = `
-                        <div class="playlist-item">
-                            <img src="${thumbnailUrl}" alt="${title}">
-                            <p><a href="https://pokemogukunns.github.io/github-yuki/playlist/?list=${playlistId}" target="_blank">${title}</a></p>
-                        </div>
-                    `;
-                    playlistContainer.innerHTML += playlistElement;
-                });
-            } else {
-                document.getElementById('playlist-container').textContent = 'プレイリストが見つかりませんでした';
-            }
-        })
-        .catch(error => {
-            console.error('プレイリスト取得時にエラーが発生しました:', error);
-        });
+// 次のページを取得する関数
+function fetchNextPage() {
+    const identifier = getChannelIdFromUrl();
+    const apiKey = apiKeys[currentKeyIndex];
+    if (identifier && nextPageToken) {
+        fetchChannelVideos(identifier, apiKey, 50, nextPageToken);
+        currentPage++;
+        document.getElementById('current-page').textContent = `ページ ${currentPage}`;
+    }
 }
-        
+
 // ページ読み込み時にチャンネルIDまたはハンドルを取得して情報を表示
 window.onload = function() {
     const identifier = getChannelIdFromUrl();
