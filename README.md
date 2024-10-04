@@ -237,4 +237,5 @@
  
 <div class="gamification-timeleft" style="display: none;"></div>
 <div class="gamification-timeleft" style="display: none;"></div></body>
-</html>
+</html><br>
+©︎pokemogukunn
