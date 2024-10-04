@@ -11,6 +11,61 @@
 　　<script src="/main.js" async></script>
    <script src="/cache.js" async></script>
 </head>
+    <style>
+    /* 動画コンテナのスタイル */
+        #video-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        /* 各動画アイテムのスタイル */
+        .video-item {
+            width: 18%; /* 各動画アイテムの幅を指定 */
+            margin: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* サムネイル画像のスタイル */
+        .video-item img {
+            width: 100%;
+            height: auto;
+        }
+
+        /* 動画タイトルのスタイル */
+        .video-item p {
+            font-size: 14px;
+            padding: 10px;
+            margin: 0;
+            background-color: #f9f9f9;
+            border-top: 1px solid #ddd;
+        }
+
+        /* ボタンのスタイル */
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* ページ番号のスタイル */
+        #current-page {
+            font-size: 18px;
+            margin-top: 10px;
+        }
+    </style>
 <body class="no-theme">
     
     <span style="display:none" id="dark_mode_pref"></span>
