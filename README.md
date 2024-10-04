@@ -18,7 +18,8 @@
 **これは自分のリポジトリ名に変更してください。**
 
 <a herf="./home"><img src="https://lms.catchon.jp/student/images/button/surala_logo_login.png" alt="logo" algin="center"></a><br>
-<html lang="ja" style="--vh: 8.72px;">
+
+<!--<html lang="ja" style="--vh: 8.72px;">
 	<head>
 		<meta name="robots" content="noindex,nofollow,none,noarchive">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -56,9 +57,10 @@
 	 See details of your web browser for how to enable JavaScript.</noscript>
 		<div id="index_gamification"></div>
 		<div id="headerArea">
-			<iframe name="head" id="head_check" frameborder="0" marginwidth="0" marginheight="0" src="lms.php" tabindex="-1"></iframe>
+			<iframe name="head" id="head_check" frameborder="0" marginwidth="0" marginheight="0" src="https://lms.catchon.jp/lms.php" tabindex="-1"></iframe>
       <div class="hamburger-menu-btn-wrap" id="hamburger-menu-btn">
-        <button type="button" class="header-menu-item fn-menu-open" onclick="getReplyNotify();" data-target="hamburgerMenu"> <!-- add uenishi 2023/05/25 生徒画面改修開発-SMALL-443 -->
+        <button type="button" class="header-menu-item fn-menu-open" onclick="getReplyNotify();" data-target="hamburgerMenu">
+	<!-- add uenishi 2023/05/25 生徒画面改修開発-SMALL-443 -->
           <span class="hamburger-icon">
             <span></span>
             <span></span>
@@ -232,12 +234,13 @@
             });
           }
         } 
-      </script>
+      </script>-->
 	<input type="hidden" id="csrfp_hidden_data_token" value="csrfp_token">
 <input type="hidden" id="csrfp_hidden_data_urls" value="[]">
-<script type="text/javascript" src="https://lms.catchon.jp/javascript/csrfprotector.js"></script>
+<!--<script type="text/javascript" src="https://lms.catchon.jp/javascript/csrfprotector.js"></script>-->
  
 <div class="gamification-timeleft" style="display: none;"></div>
 <div class="gamification-timeleft" style="display: none;"></div></body>
-</html><br>
+</html>
+<br>
 ©︎pokemogukunn
