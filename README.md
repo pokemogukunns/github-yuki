@@ -19,8 +19,8 @@
 
 <a herf="./home"><img src="https://lms.catchon.jp/student/images/button/surala_logo_login.png" alt="logo" algin="center"></a><br>
 
-<!--<html lang="ja" style="--vh: 8.72px;">
-	<head>
+<html lang="ja" style="--vh: 8.72px;">
+	<!--<head>
 		<meta name="robots" content="noindex,nofollow,none,noarchive">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta http-equiv="Content-Style-Type" content="text/css">
@@ -34,23 +34,23 @@
 		<script type="text/javascript" src="https://lms.catchon.jp/student/javascript/mondai_disp_overlay.js"></script>
 		<link rel="stylesheet" href="https://lms.catchon.jp/css/student_base.css" type="text/css">
 		<!-- <link rel="stylesheet" href="https://lms.catchon.jp/css/student_base_standard.css" type="text/css"> -->
-		<link rel="stylesheet" href="https://lms.catchon.jp/teacher/Apl/css/toast.css">
+		<!--<link rel="stylesheet" href="https://lms.catchon.jp/teacher/Apl/css/toast.css">
 		<script type="text/javascript" src="https://lms.catchon.jp/javascript/jquery-1.7.2.min.js"></script>
 		<script type="text/javascript" src="https://lms.catchon.jp/teacher/Apl/javascript/toast.js"></script>
     <!-- common css -->
-    <link rel="stylesheet" href="https://lms.catchon.jp/css/surala_standard/renewal/ress.min.css">
+    <!--<link rel="stylesheet" href="https://lms.catchon.jp/css/surala_standard/renewal/ress.min.css">
     <link rel="stylesheet" href="https://lms.catchon.jp/css/surala_standard/renewal/simplebar.css">
     <link rel="stylesheet" href="https://lms.catchon.jp/css/surala_standard/renewal/myfont.css">
     <link rel="stylesheet" href="https://lms.catchon.jp/css/surala_standard/renewal/compiled.css">
     <!-- /common css -->
     <!-- common js -->
-    <script type="text/javascript" src="https://lms.catchon.jp/javascript/surala_standard/renewal/vendor/simplebar.min.js"></script>
+    <!--<script type="text/javascript" src="https://lms.catchon.jp/javascript/surala_standard/renewal/vendor/simplebar.min.js"></script>
     <script type="text/javascript" src="https://lms.catchon.jp/javascript/surala_standard/renewal/vendor/micromodal.min.js"></script>
     <!-- /common js -->
-    <link rel="stylesheet" href="https://lms.catchon.jp/css/surala_standard/renewal/standard_renewal_top.css">
+    <!--<link rel="stylesheet" href="https://lms.catchon.jp/css/surala_standard/renewal/standard_renewal_top.css">
     <script type="text/javascript" src="https://lms.catchon.jp/javascript/student_lms.js"></script>
  
-	</head>
+	</head>-->
 	<body onload="ifr_load_src('study_top.php', ''); ifr_resize_standard(); return false;" onresize="ifr_resize_standard();  return false;"> 
  <noscript>This site attempts to protect users against <a href="https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29">
 	Cross-Site Request Forgeries </a> attacks. In order to do so, you must have JavaScript enabled in your web browser otherwise this site will fail to work correctly for you.
