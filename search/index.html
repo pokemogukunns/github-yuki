@@ -24,7 +24,9 @@
           </form> 
         </div> 
       </div> 
-      <div class="pure-g"> 
+      <div class="pure-g" id="results"></div>
+      
+      <!--<div class="pure-g"> 
         {% for result in results %}
           <div class="pure-u-1 pure-u-md-1-4">
             <div class="h-box"> 
@@ -46,9 +48,83 @@
         <div class="pure-u-1 pure-u-lg-1-5"></div> 
         <div class="pure-u-1 pure-u-lg-3-5"></div> 
         <div class="pure-u-1 pure-u-lg-1-5" style="text-align:right"> 
-          <a href="{{next}}"> 次のページ </a> 
+          <a id="next-page" href="#">次のページ</a> 
         </div> 
-      </div> 
+      </div> -->
+
+       <script>
+        // YouTube Data APIのAPIキーを設定
+        const apiKey = 'YOUR_YOUTUBE_API_KEY'; // ここにAPIキーを挿入
+
+        // URLのクエリパラメータから検索ワードを取得
+        const urlParams = new URLSearchParams(window.location.search);
+        const query = urlParams.get('q');
+        
+        // APIリクエスト用のページトークン
+        let nextPageToken = '';
+
+        // YouTube検索関数
+        async function searchYouTube(query, pageToken = '') {
+          const apiUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=20&q=${encodeURIComponent(query)}&key=${apiKey}&pageToken=${pageToken}`;
+          
+          try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            nextPageToken = data.nextPageToken;
+            displayResults(data.items);
+          } catch (error) {
+            console.error('Error fetching data:', error);
+            document.getElementById('results').innerHTML = '<p>データの取得中にエラーが発生しました。</p>';
+          }
+        }
+
+        // 検索結果を表示する関数
+        function displayResults(items) {
+          const resultsDiv = document.getElementById('results');
+          resultsDiv.innerHTML = ''; // 初期化
+
+          if (items.length === 0) {
+            resultsDiv.innerHTML = '<p>結果が見つかりませんでした。</p>';
+            return;
+          }
+
+          items.forEach(item => {
+            const videoId = item.id.videoId || item.id.channelId;
+            const title = item.snippet.title;
+            const thumbnailUrl = item.snippet.thumbnails.default.url;
+            const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+            const resultItem = `
+              <div class="pure-u-1 pure-u-md-1-4">
+                <div class="h-box">
+                  <a href="${videoUrl}" target="_blank">
+                    <div class="thumbnail">
+                      <img loading="lazy" src="${thumbnailUrl}" alt="${title}">
+                    </div>
+                    <p>${title}</p>
+                  </a>
+                </div>
+              </div>
+            `;
+            resultsDiv.innerHTML += resultItem;
+          });
+        }
+
+        // ページがロードされたらYouTube検索を実行
+        window.onload = () => {
+          if (query) {
+            searchYouTube(query);
+          }
+        };
+
+        // 次のページリンクのクリックイベント
+        document.getElementById('next-page').addEventListener('click', (event) => {
+          event.preventDefault();
+          if (nextPageToken) {
+            searchYouTube(query, nextPageToken);
+          }
+        });
+      </script>
       
       <script>
         function updateSpan() {
