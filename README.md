@@ -18,7 +18,8 @@
 **これは自分のリポジトリ名に変更してください。**
 
 <a herf="./home"><img src="https://lms.catchon.jp/student/images/button/surala_logo_login.png" alt="logo" algin="center"></a><br>
-<html lang="ja" style="--vh: 8.72px;"><head>
+<html lang="ja" style="--vh: 8.72px;">
+	<head>
 		<meta name="robots" content="noindex,nofollow,none,noarchive">
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<meta http-equiv="Content-Style-Type" content="text/css">
@@ -49,7 +50,8 @@
     <script type="text/javascript" src="https://lms.catchon.jp/javascript/student_lms.js"></script>
  
 	</head>
-	<body onload="ifr_load_src('study_top.php', ''); ifr_resize_standard(); return false;" onresize="ifr_resize_standard();  return false;"> <noscript>This site attempts to protect users against <a href="https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29">
+	<body onload="ifr_load_src('study_top.php', ''); ifr_resize_standard(); return false;" onresize="ifr_resize_standard();  return false;"> 
+ <noscript>This site attempts to protect users against <a href="https://www.owasp.org/index.php/Cross-Site_Request_Forgery_%28CSRF%29">
 	Cross-Site Request Forgeries </a> attacks. In order to do so, you must have JavaScript enabled in your web browser otherwise this site will fail to work correctly for you.
 	 See details of your web browser for how to enable JavaScript.</noscript>
 		<div id="index_gamification"></div>
