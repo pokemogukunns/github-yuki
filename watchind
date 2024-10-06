@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://pokemogukunns.github.io/keiryouka/css/pure-min.css">
+  <link rel="stylesheet" href="https://pokemogukunns.github.io/keiryouka/css/grids-responsive-min.css">
+  <link rel="stylesheet" href="https://pokemogukunns.github.io/keiryouka/css/ionicons.min.css">
+  <link rel="stylesheet" href="https://pokemogukunns.github.io/keiryouka/css/default.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/main.js" async></script>
+  <script src="/cache.js" async></script>
+</head>
+<body class="no-theme">
+  <div class="pure-g"> 
+    <div class="pure-u-1 pure-u-md-2-24"></div> 
+    <div class="pure-u-1 pure-u-md-20-24" id="contents"> 
+      <div class="pure-g navbar h-box"> 
+        <div class="pure-u-1 pure-u-md-12-24 searchbar">
+          <a href="./requestform">新機能の要望やバグ報告</a><br> 
+          <a href="./bbs">掲示板</a>
+          <form class="pure-form" action="/github-yuki/search/" method="get"> 
+            <fieldset> 
+              <input type="search" id="searchbox" autocomplete="on" autocorrect="on" autocapitalize="none" spellcheck="false" name="q" placeholder="検索" title="検索" value=""> 
+            </fieldset> 
+          </form> 
+        </div> 
+      </div> 
+      <div id="player-container" class="h-box"> 
+        <video style="outline:none;width:100%;background-color:#000;" id="player" controls>
+          <source src="https://img.youtube.com/vi/${videoId}/0.jpg">
+        </video>
+      </div> 
+           <div class="h-box"> <h1 id="video-title"></h1> </div> <div class="pure-g"> 
+        <div class="pure-u-1 pure-u-lg-1-5"> 
+          <a id="download-button" href="/github-yuki/download/video/#${videoId}" target="_blank">download</a><br>
+          <a href="javascript:{navigator.share({title: '動画を共有',text: '{{videotitle}}',url: location.protocol+'//'+document.domain+'/watch?v={{ videoid }}'+'&t='+Math.floor(document.getElementById('player').currentTime),})}">現時点の動画を共有</a><br>
+          <a href="javascript:{navigator.share({title: '動画を共有',text: '{{videotitle}}',url: location.href,})}">動画を共有</a><br> 
+          <br><hr> </div> <div class="pure-u-1 pure-u-lg-3-5">
+            <div class="h-box">
+            <a href="/github-yuki/channel#${channelName}"></span>
+              <div class="channel-profile">
+                
+                <img id="channelIcon" src="" alt="チャンネルアイコン" width="50" height="50" style="display:none;">
+                
+                <h2 id="channelName"><span id="channelName"></span></h2> </div> </a> 
+              <br>
+            <div id="description-box"> <p id="video-description"></p> </div><br>
+            </div>
+            <hr> <ul id="comments-list"></ul>
+          </div> 
+        <div class="pure-u-1 pure-u-lg-1-5">
+          <!--自動再生<input type="checkbox" id="autonext" onchange="checkautoplay()"><br>-->
+          
+          ループ再生<input type="checkbox" id="loop" onchange="changeloop()"><a href="/github-yuki/watch?v=${videoId}">
+            <div class="thumbnail">
+              <img loading="lazy" class="thumbnail" src="https://img.youtube.com/vi/${videoId}/0.jpg">
+            </div>
+            <div class="related-video" id="relatedVideoList">
+              </biv>
+            <ul id="relatedVideoList"></ul><br> 
+          <a href="/github-yuki/channel#{{re['authorId']}}">{{re["author"]}}</a></div> </div> </div> </div> 
+    </div>
+    <div class="pure-u-1 pure-u-md-2-24"></div> 
+  </div>
+
+<!--
+<script>
+        // APIキーのリスト（優先順）
+        const apiKeys = [
+            'AIzaSyCfLrK2FPzEZllvwhjmugZ8Bwvzp6GRVpU',
+            'AIzaSyDd2Bw7VOBD1vmLWHAsQ1PcKKFdB3jvmFE',
+            'AIzaSyB0Ykrh1wzhafrD3aYEfVlGnEohMTM7X7E',
+            'AIzaSyBi4w3SxmDe9AWpH12AUBEN_YLgJQFnQpY'
+        ];
+        let currentKeyIndex = 0; // 現在使用中のAPIキーのインデックス
+
+        // URLクエリパラメータから値を取得する関数
+        function getQueryParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+
+        // ビデオIDからチャンネルIDとビデオ詳細、概要、コメントを取得する関数
+        function fetchVideoDetails(videoId) {
+            const apiKey = apiKeys[currentKeyIndex];
+            const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${videoId}&key=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.items && data.items.length > 0) {
+                        const snippet = data.items[0].snippet;
+                        const channelId = snippet.channelId;
+                        const videoTitle = snippet.title;
+                        const videoDescription = snippet.description;
+
+                        // ビデオタイトルと概要を表示
+                        document.getElementById('video-title').textContent = `${videoTitle}`;
+                        document.getElementById('video-description').textContent = `${videoDescription}`;
+                        
+                        // チャンネル情報を取得
+                        fetchChannelInfo(channelId);
+
+                        // コメントを取得
+                        fetchComments(videoId);
+                    } else {
+                        document.getElementById('video-title').textContent = 'ビデオが見つかりませんでした';
+                    }
+                })
+                .catch(error => {
+                    console.error('エラーが発生しました:', error);
+                    if (currentKeyIndex < apiKeys.length - 1) {
+                        // 次のAPIキーを試す
+                        currentKeyIndex++;
+                        fetchVideoDetails(videoId); // 再度リクエスト
+                    } else {
+                        // すべてのAPIキーが失敗した場合
+                        document.getElementById('video-title').textContent = 'すべてのAPIキーが失敗しました';
+                    }
+                });
+        }
+
+        // チャンネル情報を取得する関数
+        function fetchChannelInfo(channelId) {
+            const apiKey = apiKeys[currentKeyIndex];
+            const url = `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelId}&key=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.items && data.items.length > 0) {
+                        const channel = data.items[0].snippet;
+                        document.getElementById('channel-name').textContent = `チャンネル名: ${channel.title}`;
+                        const iconElement = document.getElementById('channel-icon');
+                        iconElement.src = channel.thumbnails.default.url;
+                        iconElement.style.display = 'block'; // アイコンを表示
+                    } else {
+                        document.getElementById('channel-name').textContent = 'チャンネルが見つかりませんでした';
+                    }
+                })
+                .catch(error => {
+                    console.error('エラーが発生しました:', error);
+                    if (currentKeyIndex < apiKeys.length - 1) {
+                        // 次のAPIキーを試す
+                        currentKeyIndex++;
+                        fetchChannelInfo(channelId); // 再度リクエスト
+                    } else {
+                        document.getElementById('channel-name').textContent = 'すべてのAPIキーが失敗しました';
+                    }
+                });
+        }
+
+        // コメントを取得する関数
+        function fetchComments(videoId) {
+            const apiKey = apiKeys[currentKeyIndex];
+            const url = `https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=${videoId}&key=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const commentsList = document.getElementById('comments-list');
+                    commentsList.innerHTML = ''; // 既存のコメントをクリア
+
+                    if (data.items && data.items.length > 0) {
+                        data.items.forEach(item => {
+                            const comment = item.snippet.topLevelComment.snippet.textDisplay;
+                            const commentElement = document.createElement('li');
+                            commentElement.innerHTML = comment;
+                            commentsList.appendChild(commentElement);
+                        });
+                    } else {
+                        const noComments = document.createElement('li');
+                        noComments.textContent = 'コメントが見つかりませんでした';
+                        commentsList.appendChild(noComments);
+                    }
+                })
+                .catch(error => {
+                    console.error('コメントの取得中にエラーが発生しました:', error);
+                    const commentsList = document.getElementById('comments-list');
+                    const errorMessage = document.createElement('li');
+                    errorMessage.textContent = 'コメントの取得に失敗しました';
+                    commentsList.appendChild(errorMessage);
+                });
+        }
+
+        // 関連動画を取得する関数
+        function fetchRelatedVideos(videoId) {
+            const apiKey = apiKeys[currentKeyIndex];
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&relatedToVideoId=${videoId}&type=video&key=${apiKey}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.items.length > 0) {
+                        const relatedVideoList = document.getElementById('relatedVideoList');
+                        relatedVideoList.innerHTML = ''; // 既存の動画をクリア
+                        data.items.forEach(item => {
+                            const relatedVideo = document.createElement('li');
+                            relatedVideo.textContent = item.snippet.title;
+                            relatedVideoList.appendChild(relatedVideo);
+                        });
+                    } else {
+                        document.getElementById('relatedVideoList').innerText = "関連動画が見つかりませんでした";
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching related videos:', error);
+                    document.getElementById('relatedVideoList').innerText = "エラーが発生しました";
+                });
+        }
+
+        // ビデオをダウンロードするURLを取得する関数
+        const YOUTUBE_DL_SERVER = 'https://youtube-dl-server-lolo.onrender.com';
+        function fetchStreamUrl(videoId) {
+            const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+            const apiUrl = `${YOUTUBE_DL_SERVER}/download?url=${encodeURIComponent(youtubeUrl)}`;
+
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.url) {
+                        const downloadButton = document.getElementById('download-button'); // ボタンの要素を取得
+                        downloadButton.href = data.url; // ダウンロードURLを設定
+                        downloadButton.target = "_blank"; // 新しいタブでリンクを開く
+                    }
+                })
+                .catch(error => {
+                    console.error('エラーが発生しました:', error);
+                });
+        }
+
+        // 初期化処理
+        const videoId = getQueryParam('v'); // URLからビデオIDを取得
+        if (videoId) {
+            fetchVideoDetails(videoId); // ビデオの詳細を取得
+            fetchRelatedVideos(videoId); // 関連動画を取得
+            fetchStreamUrl(videoId); // ダウンロードリンクを設定
+        } else {
+            document.getElementById('video-title').textContent = 'ビデオIDが指定されていません';
+        }
+    </script>-->
+  <!--
+    <script>
+    // 関連動画をHTMLに表示する関数
+        function displayRelatedVideos(videos) {
+            const relatedVideoList = document.getElementById('relatedVideoList');
+            relatedVideoList.innerHTML = ''; // 現在のコンテンツをクリア
+
+            videos.forEach(video => {
+                const title = video.snippet.title;
+                const videoId = video.id.videoId;
+                const thumbnailUrl = video.snippet.thumbnails.medium.url;
+                const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
+
+                const videoItem = document.createElement('div');
+                videoItem.classList.add('video-item');
+
+                const videoLink = document.createElement('a');
+                videoLink.href = videoUrl;
+                videoLink.target = '_blank'; // 新しいタブで開く
+
+                const thumbnail = document.createElement('img');
+                thumbnail.src = thumbnailUrl;
+                thumbnail.alt = title;
+
+                const videoTitle = document.createElement('h3');
+                videoTitle.innerText = title;
+
+                videoLink.appendChild(thumbnail);
+                videoLink.appendChild(videoTitle);
+                videoItem.appendChild(videoLink);
+                relatedVideoList.appendChild(videoItem);
+            });
+        }
+
+        // ページが読み込まれたら関連動画を取得
+        window.onload = function() {
+            getRelatedVideos();
+        }; 
+</script>-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--
+<script>
+// youtube-dl-serverのURLを設定
+const YOUTUBE_DL_SERVER = 'https://youtube-dl-server-lolo.onrender.com'; // 指定されたyoutube-dl-serverのアドレス
+
+// ストリームURLを取得してHTMLに表示する関数
+function fetchStreamUrl(videoId) {
+    const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    const apiUrl = `${YOUTUBE_DL_SERVER}/download?url=${encodeURIComponent(youtubeUrl)}`; // youtube-dl-serverのAPIエンドポイント
+
+    // youtube-dl-serverを使ってストリームURLを取得
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data.url) {
+                // ストリームURLが取得できた場合
+                const streamUrl = data.url;
+                const streamUrlElement = document.getElementById('stream-url');
+                
+                // ダウンロードボタンを生成
+                const downloadButton = document.createElement('a');
+                
+                // aタグの属性を設定
+                downloadButton.href = streamUrl;
+                downloadButton.textContent = 'ダウンロード';
+                downloadButton.classList.add('download-button'); // クラスを追加（CSS用）
+                downloadButton.setAttribute('download', 'video.mp4'); // ダウンロード属性を設定
+
+                // ダウンロードボタンをHTMLに追加
+                streamUrlElement.appendChild(downloadButton);
+            } else {
+                console.error('ストリームURLが取得できませんでした');
+            }
+        })
+        .catch(error => {
+            console.error('エラーが発生しました:', error);
+        });
+}
+
+// ページ読み込み時にビデオIDを取得して処理を開始
+window.onload = function() {
+    const videoId = getQueryParam('v'); // URLから動画IDを取得
+    if (videoId) {
+        fetchStreamUrl(videoId); // ストリームURLを取得
+    } else {
+        document.getElementById('video-title').textContent = 'ビデオIDが見つかりません';
+    }
+};
+
+// URLクエリパラメータから値を取得する関数
+function getQueryParam(param) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(param);
+}
+</script>-->
+</body>
+</html>
