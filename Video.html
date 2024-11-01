@@ -15,18 +15,21 @@
             max-width: 100px;
             margin-top: 10px;
         }
+        .error {
+            color: red;
+        }
     </style>
 </head>
 <body>
 
     <h1>動画情報を取得中...</h1>
+    <div id="videoInfo"></div>
+    <div id="errorMessage" class="error"></div>
 
     <script>
         async function fetchVideoData(videoId) {
             const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
             const url = `${proxyUrl}https://inv.nadeko.net/api/v1/videos/${videoId}`;
-            console.log('リクエストURL:', url); // リクエストURLをコンソールに表示
-            
             const response = await fetch(url);
             
             if (!response.ok) {
@@ -35,7 +38,6 @@
             }
 
             const responseData = await response.json();
-            console.log('APIレスポンス:', responseData); // レスポンスをコンソールに表示
             return responseData;
         }
 
@@ -50,7 +52,8 @@
         }
 
         function displayVideoInfo(videoInfo) {
-            document.body.innerHTML = ''; // コンテンツをクリア
+            const videoInfoDiv = document.getElementById('videoInfo');
+            videoInfoDiv.innerHTML = ''; // コンテンツをクリア
 
             const titleElement = document.createElement('h1');
             titleElement.textContent = videoInfo.title;
@@ -69,18 +72,19 @@
             channelIconElement.src = videoInfo.channelIcon;
             channelIconElement.alt = `${videoInfo.channel}のアイコン`;
 
-            document.body.appendChild(titleElement);
-            document.body.appendChild(descriptionElement);
-            document.body.appendChild(videoElement);
-            document.body.appendChild(channelElement);
-            document.body.appendChild(channelIconElement);
+            videoInfoDiv.appendChild(titleElement);
+            videoInfoDiv.appendChild(descriptionElement);
+            videoInfoDiv.appendChild(videoElement);
+            videoInfoDiv.appendChild(channelElement);
+            videoInfoDiv.appendChild(channelIconElement);
         }
 
         async function loadVideo() {
             const videoId = window.location.hash.substring(1); // URLのハッシュ部分からIDを取得
-            console.log('取得した動画ID:', videoId); // 動画IDをコンソールに表示
+            const errorMessageDiv = document.getElementById('errorMessage');
+
             if (!videoId) {
-                document.body.textContent = '動画IDが指定されていません。';
+                errorMessageDiv.textContent = '動画IDが指定されていません。';
                 return;
             }
 
@@ -89,8 +93,7 @@
                 const videoInfo = parseVideoData(data);
                 displayVideoInfo(videoInfo);
             } catch (error) {
-                console.error('動画情報の取得に失敗しました:', error);
-                document.body.textContent = `動画情報の取得に失敗しました: ${error.message}`;
+                errorMessageDiv.textContent = `動画情報の取得に失敗しました: ${error.message}`;
             }
         }
 
