@@ -23,13 +23,17 @@
 
     <script>
         async function fetchVideoData(videoId) {
-            const url = `https://inv.nadeko.net/api/v1/videos/${videoId}`;
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        }
+    const url = `https://inv.nadeko.net/api/v1/videos/${videoId}`;
+    const response = await fetch(url);
+    
+    const responseData = await response.json(); // ここでレスポンスをJSONとして取得
+    console.log('APIレスポンス:', responseData); // レスポンスをコンソールに表示
+
+    if (!response.ok) {
+        throw new Error(`Error: ${responseData.error}`);
+    }
+    return responseData;
+}
 
         function parseVideoData(data) {
             return {
@@ -68,22 +72,23 @@
             document.body.appendChild(channelIconElement);
         }
 
-        async function loadVideo() {
-            const videoId = window.location.hash.substring(1); // URLのハッシュ部分からIDを取得
-            if (!videoId) {
-                document.body.textContent = '動画IDが指定されていません。';
-                return;
-            }
+            async function loadVideo() {
+    const videoId = window.location.hash.substring(1); // URLのハッシュ部分からIDを取得
+    if (!videoId) {
+        document.body.textContent = '動画IDが指定されていません。';
+        return;
+    }
 
-            try {
-                const data = await fetchVideoData(videoId);
-                const videoInfo = parseVideoData(data);
-                displayVideoInfo(videoInfo);
-            } catch (error) {
-                console.error('動画情報の取得に失敗しました:', error);
-                document.body.textContent = '動画情報の取得に失敗しました。';
-            }
-        }
+    try {
+        const data = await fetchVideoData(videoId);
+        const videoInfo = parseVideoData(data);
+        displayVideoInfo(videoInfo);
+    } catch (error) {
+        console.error('動画情報の取得に失敗しました:', error);
+        document.body.textContent = `動画情報の取得に失敗しました: ${error.message}`;
+    }
+}
+
 
         loadVideo(); // ページ読み込み時に動画をロード
     </script>
