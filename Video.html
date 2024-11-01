@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invidious Video Viewer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        img {
+            max-width: 100px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>動画情報を取得中...</h1>
+
+    <script>
+        async function fetchVideoData(videoId) {
+            const url = `https://youtube.privacyplz.org/api/v1/videos/${videoId}`;
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        }
+
+        function parseVideoData(data) {
+            return {
+                title: data.title,
+                description: data.description,
+                streamUrl: data.videoUrl,
+                channel: data.author,
+                channelIcon: data.authorThumbnails[0].url
+            };
+        }
+
+        function displayVideoInfo(videoInfo) {
+            document.body.innerHTML = ''; // コンテンツをクリア
+
+            const titleElement = document.createElement('h1');
+            titleElement.textContent = videoInfo.title;
+
+            const descriptionElement = document.createElement('p');
+            descriptionElement.textContent = videoInfo.description;
+
+            const videoElement = document.createElement('video');
+            videoElement.src = videoInfo.streamUrl;
+            videoElement.controls = true;
+
+            const channelElement = document.createElement('p');
+            channelElement.textContent = `チャンネル: ${videoInfo.channel}`;
+
+            const channelIconElement = document.createElement('img');
+            channelIconElement.src = videoInfo.channelIcon;
+            channelIconElement.alt = `${videoInfo.channel}のアイコン`;
+
+            document.body.appendChild(titleElement);
+            document.body.appendChild(descriptionElement);
+            document.body.appendChild(videoElement);
+            document.body.appendChild(channelElement);
+            document.body.appendChild(channelIconElement);
+        }
+
+        async function loadVideo() {
+            const videoId = window.location.hash.substring(1); // URLのハッシュ部分からIDを取得
+            if (!videoId) {
+                document.body.textContent = '動画IDが指定されていません。';
+                return;
+            }
+
+            try {
+                const data = await fetchVideoData(videoId);
+                const videoInfo = parseVideoData(data);
+                displayVideoInfo(videoInfo);
+            } catch (error) {
+                console.error('動画情報の取得に失敗しました:', error);
+                document.body.textContent = '動画情報の取得に失敗しました。';
+            }
+        }
+
+        loadVideo(); // ページ読み込み時に動画をロード
+    </script>
+
+</body>
+</html>
